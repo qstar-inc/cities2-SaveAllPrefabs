@@ -1,6 +1,6 @@
 ﻿<Publish>
 	<!--Id must be set in order to update existed mod. it is not required for publishing mod for the first time-->
-	<ModId Value="" />
+	<ModId Value="85340" />
 	<!--Name of the mod to display to players-->
 	<DisplayName Value="Save All Prefabs" />
 	<!--Short description of the mod-->
@@ -10,7 +10,7 @@
 	<LongDescription>
 # Save all prefabs
 
-This mod currently adds a lot of stuff, including the roads, to the editor hierarchy. You can use this to create custom road asset packs etc.
+This mod adds a lot of stuff, including the roads, to the editor hierarchy so that you can save them on the disk. You can use this to create custom road asset packs etc.
 
 ## Creating custom roads
 
