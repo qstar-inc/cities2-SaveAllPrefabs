@@ -1,0 +1,50 @@
+﻿<Publish>
+	<!--Id must be set in order to update existed mod. it is not required for publishing mod for the first time-->
+	<ModId Value="" />
+	<!--Name of the mod to display to players-->
+	<DisplayName Value="Save All Prefabs" />
+	<!--Short description of the mod-->
+	<ShortDescription Value="Allows saving all prefabs, not just objects, in the editor" />
+	<!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
+	<!--LongDescription Value="This mod currently adds a lot of stuff, including the roads, to the editor hierarchy. You can use this to create custom road asset packs etc." /-->
+	<LongDescription>
+# Save all prefabs
+
+This mod currently adds a lot of stuff, including the roads, to the editor hierarchy. You can use this to create custom road asset packs etc.
+
+## Creating custom roads
+
+* Enable the mod in the settings
+* Go to the editor.
+* Select "Edit prefab" and choose any road.
+* Click "Duplicate template". This will create a new prefab for you to edit.
+* Set the name of the prefab to something recognizable. This will be the name of the asset in the code, and it will not be visible to the user. Avoid special characters such as "/".
+* Select "Add Object" and build your new road so you can see what you do.
+* Go back to "Edit prefab" and at the very top of the sidebar, you can edit the sections, i.e. the lanes of the road. Add and remove any lanes, medians, sidewalks, tracks, etc.
+* When you are satisfied, find your road from the hierarchy and click the save button.
+* The prefab will be saved to AppData\LocalLow\Colossal Order\Cities Skylines II\StreamingData~
+* Restart the game after adding the new assets before using them
+
+To share the assets, see e.g. https://github.com/kosch104/CS2-CustomAssetPack
+	</LongDescription>
+	<!--Thumbnail-->
+	<Thumbnail Value="Properties/Thumbnail.png" />
+	<!--Screenshot, can be set multiple times-->
+	<Screenshot Value="Properties/Screenshot.png" />
+	<!--Tag, can be set multiple times-->
+	<Tag Value="" />
+	<!--Link to the forum post where the mod can be discussed-->
+	<ForumLink Value="" />
+	<!--Version of the mod-->
+	<ModVersion Value="1.0" />
+	<!--Recommended version of the base game to use the mod-->
+	<GameVersion Value="1.1.7f1" />
+	<!--Dependency for the mod, can be set multiple times-->
+	<Dependency Id="" />
+	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
+	<ChangeLog Value="" />
+	<!--ChangeLog>
+	</ChangeLog-->
+	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
+	<ExternalLink Type="" Url="" />
+</Publish>
