@@ -32,7 +32,7 @@ To share the assets, see e.g. https://github.com/kosch104/CS2-CustomAssetPack
 	<!--Screenshot, can be set multiple times-->
 	<Screenshot Value="Properties/Screenshot.png" />
 	<!--Tag, can be set multiple times-->
-	<Tag Value="" />
+	<Tag Value="Code Mod" />
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="" />
 	<!--Version of the mod-->
@@ -46,5 +46,5 @@ To share the assets, see e.g. https://github.com/kosch104/CS2-CustomAssetPack
 	<!--ChangeLog>
 	</ChangeLog-->
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
-	<ExternalLink Type="" Url="" />
+	<ExternalLink Type="github" Url="https://github.com/fergusq/SaveAllPrefabs" />
 </Publish>
