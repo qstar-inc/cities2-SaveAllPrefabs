@@ -30,8 +30,8 @@ namespace SaveAllPrefabs
 
             void updateEnabledSystems(Game.Settings.Setting _setting)
             {
-                updateSystem.World.GetExistingSystemManaged<PatchedEditorHierarchyUISystem>().Enabled = m_Setting.ModEnabled;
-                updateSystem.World.GetExistingSystemManaged<EditorHierarchyUISystem>().Enabled = !m_Setting.ModEnabled;
+                updateSystem.World.GetOrCreateSystemManaged<PatchedEditorHierarchyUISystem>().Enabled = m_Setting.ModEnabled;
+                updateSystem.World.GetOrCreateSystemManaged<EditorHierarchyUISystem>().Enabled = !m_Setting.ModEnabled;
             }
 
             updateEnabledSystems(null);
