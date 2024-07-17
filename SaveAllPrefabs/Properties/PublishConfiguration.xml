@@ -10,11 +10,11 @@
 	<LongDescription>
 # Save all prefabs
 
-This mod adds a lot of stuff, including the roads, to the editor hierarchy so that you can save them on the disk. You can use this to create custom road asset packs etc.
+This mod allows you to save roads and other "non-object" prefabs created in the editor. You can easily make custom roads with any lanes you want. The prefabs will appear in the hierarchy at the top left with a save button. You can use this to create custom road asset packs etc.
 
 ## Creating custom roads
 
-* Enable the mod in the settings
+* Enable the mod in the settings. **The current version of the mod needs to be enabled before it does anything.**
 * Go to the editor.
 * Select "Edit prefab" and choose any road.
 * Click "Duplicate template". This will create a new prefab for you to edit.
@@ -26,6 +26,10 @@ This mod adds a lot of stuff, including the roads, to the editor hierarchy so th
 * Restart the game after adding the new assets before using them
 
 To share the assets, see e.g. https://github.com/kosch104/CS2-CustomAssetPack
+
+## Thanks
+
+Thanks to StarQ for fixing a bug in the mod.
 	</LongDescription>
 	<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
@@ -36,13 +40,13 @@ To share the assets, see e.g. https://github.com/kosch104/CS2-CustomAssetPack
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.0" />
+	<ModVersion Value="1.1" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.1.7f1" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
-	<ChangeLog Value="" />
+	<ChangeLog Value="Fixed bug causing the mod to fail to disable the EditorHierarchyUISystem for some users." />
 	<!--ChangeLog>
 	</ChangeLog-->
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
