@@ -5,13 +5,15 @@ using Game.Modding;
 using Game.SceneFlow;
 using Game.UI.Editor;
 using SaveAllPrefabs.Systems;
+using HarmonyLib;
 
 namespace SaveAllPrefabs
 {
     public class Mod : IMod
     {
         public static ILog log = LogManager.GetLogger($"{nameof(SaveAllPrefabs)}.{nameof(Mod)}").SetShowsErrorsInUI(false);
-        private Setting m_Setting;
+        private Harmony harmony;
+        private UpdateSystem updateSystem;
 
         public void OnLoad(UpdateSystem updateSystem)
         {
@@ -20,32 +22,28 @@ namespace SaveAllPrefabs
             if (GameManager.instance.modManager.TryGetExecutableAsset(this, out var asset))
                 log.Info($"Current mod asset at {asset.path}");
 
-            m_Setting = new Setting(this);
-            m_Setting.RegisterInOptionsUI();
-            GameManager.instance.localizationManager.AddSource("en-US", new LocaleEN(m_Setting));
+            GameManager.instance.localizationManager.AddSource("en-US", new LocaleEN());
+
+            this.updateSystem = updateSystem;
 
             updateSystem.UpdateAt<PatchedEditorHierarchyUISystem>(SystemUpdatePhase.UIUpdate);
 
-            AssetDatabase.global.LoadSettings(nameof(SaveAllPrefabs), m_Setting, new Setting(this));
+            updateSystem.World.GetOrCreateSystemManaged<PatchedEditorHierarchyUISystem>().Enabled = true;
+            updateSystem.World.GetOrCreateSystemManaged<EditorHierarchyUISystem>().Enabled = false;
 
-            void updateEnabledSystems(Game.Settings.Setting _setting)
-            {
-                updateSystem.World.GetOrCreateSystemManaged<PatchedEditorHierarchyUISystem>().Enabled = m_Setting.ModEnabled;
-                updateSystem.World.GetOrCreateSystemManaged<EditorHierarchyUISystem>().Enabled = !m_Setting.ModEnabled;
-            }
-
-            updateEnabledSystems(null);
-
-            m_Setting.onSettingsApplied += updateEnabledSystems;
+            harmony = new Harmony("fergusq.save-all-prefabs");
+            harmony.PatchAll();
         }
 
         public void OnDispose()
         {
             log.Info(nameof(OnDispose));
-            if (m_Setting != null)
+            harmony?.UnpatchAll();
+
+            if (updateSystem != null)
             {
-                m_Setting.UnregisterInOptionsUI();
-                m_Setting = null;
+                updateSystem.World.GetOrCreateSystemManaged<PatchedEditorHierarchyUISystem>().Enabled = false;
+                updateSystem.World.GetOrCreateSystemManaged<EditorHierarchyUISystem>().Enabled = true;
             }
         }
     }
