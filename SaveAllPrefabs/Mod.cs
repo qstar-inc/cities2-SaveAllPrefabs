@@ -4,14 +4,16 @@ using Game;
 using Game.Modding;
 using Game.SceneFlow;
 using Game.UI.Editor;
-using SaveAllPrefabs.Systems;
 using HarmonyLib;
+using SaveAllPrefabs.Systems;
 
 namespace SaveAllPrefabs
 {
     public class Mod : IMod
     {
-        public static ILog log = LogManager.GetLogger($"{nameof(SaveAllPrefabs)}.{nameof(Mod)}").SetShowsErrorsInUI(false);
+        public static ILog log = LogManager
+            .GetLogger($"{nameof(SaveAllPrefabs)}.{nameof(Mod)}")
+            .SetShowsErrorsInUI(false);
         private Harmony harmony;
         private UpdateSystem updateSystem;
 
@@ -28,7 +30,8 @@ namespace SaveAllPrefabs
 
             updateSystem.UpdateAt<PatchedEditorHierarchyUISystem>(SystemUpdatePhase.UIUpdate);
 
-            updateSystem.World.GetOrCreateSystemManaged<PatchedEditorHierarchyUISystem>().Enabled = true;
+            updateSystem.World.GetOrCreateSystemManaged<PatchedEditorHierarchyUISystem>().Enabled =
+                true;
             updateSystem.World.GetOrCreateSystemManaged<EditorHierarchyUISystem>().Enabled = false;
 
             harmony = new Harmony("fergusq.save-all-prefabs");
@@ -42,8 +45,11 @@ namespace SaveAllPrefabs
 
             if (updateSystem != null)
             {
-                updateSystem.World.GetOrCreateSystemManaged<PatchedEditorHierarchyUISystem>().Enabled = false;
-                updateSystem.World.GetOrCreateSystemManaged<EditorHierarchyUISystem>().Enabled = true;
+                updateSystem
+                    .World.GetOrCreateSystemManaged<PatchedEditorHierarchyUISystem>()
+                    .Enabled = false;
+                updateSystem.World.GetOrCreateSystemManaged<EditorHierarchyUISystem>().Enabled =
+                    true;
             }
         }
     }

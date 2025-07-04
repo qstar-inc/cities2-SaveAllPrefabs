@@ -24,6 +24,7 @@ using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Entities.Internal;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine.Scripting;
@@ -36,7 +37,7 @@ namespace SaveAllPrefabs.Systems
         {
             Default,
             FirstPerson,
-            Orbit
+            Orbit,
         }
 
         [BurstCompile]
@@ -62,7 +63,12 @@ namespace SaveAllPrefabs.Systems
             [ReadOnly]
             public ItemType m_ItemType;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 NativeArray<Entity> nativeArray = chunk.GetNativeArray(m_EntityType);
                 NativeArray<PrefabRef> nativeArray2 = chunk.GetNativeArray(ref m_PrefabRefType);
@@ -82,7 +88,7 @@ namespace SaveAllPrefabs.Systems
                         level = 1,
                         expandable = flag,
                         expanded = flag2,
-                        selectable = true
+                        selectable = true,
                     };
                     hierarchy.Add(in value);
                     if (flag2 && m_SubMeshes.TryGetBuffer(prefab, out var bufferData))
@@ -96,10 +102,10 @@ namespace SaveAllPrefabs.Systems
                                 {
                                     type = ItemType.SubMesh,
                                     entity = nativeArray[i],
-                                    subIndex = j
+                                    subIndex = j,
                                 },
                                 level = 2,
-                                selectable = true
+                                selectable = true,
                             };
                             hierarchy2.Add(in value);
                         }
@@ -107,7 +113,12 @@ namespace SaveAllPrefabs.Systems
                 }
             }
 
-            void IJobChunk.Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            void IJobChunk.Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 Execute(in chunk, unfilteredChunkIndex, useEnabledMask, in chunkEnabledMask);
             }
@@ -184,7 +195,12 @@ namespace SaveAllPrefabs.Systems
 
             public bool EqualsHierarchy(HierarchyItem other)
             {
-                if (id == other.id && level == other.level && expandable == other.expandable && expanded == other.expanded)
+                if (
+                    id == other.id
+                    && level == other.level
+                    && expandable == other.expandable
+                    && expanded == other.expanded
+                )
                 {
                     return selectable == other.selectable;
                 }
@@ -218,7 +234,11 @@ namespace SaveAllPrefabs.Systems
 
             public int subIndex;
 
-            public bool isContainer => type == ItemType.ObjectContainer || type == ItemType.AreaContainer || type == ItemType.NetworkContainer || type == ItemType.OtherContainer;
+            public bool isContainer =>
+                type == ItemType.ObjectContainer
+                || type == ItemType.AreaContainer
+                || type == ItemType.NetworkContainer
+                || type == ItemType.OtherContainer;
 
             public ItemId(ItemType type, Entity entity = default(Entity), int subIndex = 0)
             {
@@ -351,8 +371,11 @@ namespace SaveAllPrefabs.Systems
             public void __AssignHandles(ref SystemState state)
             {
                 __Unity_Entities_Entity_TypeHandle = state.GetEntityTypeHandle();
-                __Game_Prefabs_PrefabRef_RO_ComponentTypeHandle = state.GetComponentTypeHandle<PrefabRef>(isReadOnly: true);
-                __Game_Prefabs_SubMesh_RO_BufferLookup = state.GetBufferLookup<SubMesh>(isReadOnly: true);
+                __Game_Prefabs_PrefabRef_RO_ComponentTypeHandle =
+                    state.GetComponentTypeHandle<PrefabRef>(isReadOnly: true);
+                __Game_Prefabs_SubMesh_RO_BufferLookup = state.GetBufferLookup<SubMesh>(
+                    isReadOnly: true
+                );
             }
         }
 
@@ -372,7 +395,10 @@ namespace SaveAllPrefabs.Systems
 
         private CameraUpdateSystem m_CameraUpdateSystem;
 
-        private EntityQuery m_ObjectQuery, m_NetworkQuery, m_AreaQuery, m_OtherQuery;
+        private EntityQuery m_ObjectQuery,
+            m_NetworkQuery,
+            m_AreaQuery,
+            m_OtherQuery;
 
         private EntityQuery m_ModifiedQuery;
 
@@ -411,155 +437,250 @@ namespace SaveAllPrefabs.Systems
             m_EditorToolUISystem = base.World.GetOrCreateSystemManaged<EditorToolUISystem>();
             m_EditorPanelUISystem = base.World.GetOrCreateSystemManaged<EditorPanelUISystem>();
             m_CameraUpdateSystem = base.World.GetOrCreateSystemManaged<CameraUpdateSystem>();
-            m_ObjectQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new ComponentType[2]
+            m_ObjectQuery = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                ComponentType.ReadOnly<PrefabRef>(),
-                ComponentType.ReadOnly<Game.Objects.Object>()
-                },
-                None = new ComponentType[3]
-                {
-                ComponentType.ReadOnly<Deleted>(),
-                ComponentType.ReadOnly<Owner>(),
-                ComponentType.ReadOnly<Temp>()
+                    All = new ComponentType[2]
+                    {
+                        ComponentType.ReadOnly<PrefabRef>(),
+                        ComponentType.ReadOnly<Game.Objects.Object>(),
+                    },
+                    None = new ComponentType[3]
+                    {
+                        ComponentType.ReadOnly<Deleted>(),
+                        ComponentType.ReadOnly<Owner>(),
+                        ComponentType.ReadOnly<Temp>(),
+                    },
                 }
-            });
-            m_NetworkQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new ComponentType[2]
+            );
+            m_NetworkQuery = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                ComponentType.ReadOnly<PrefabRef>(),
-                ComponentType.ReadOnly<Game.Net.Curve>()
-                },
-                None = new ComponentType[3]
-                {
-                ComponentType.ReadOnly<Deleted>(),
-                ComponentType.ReadOnly<Owner>(),
-                ComponentType.ReadOnly<Temp>()
+                    All = new ComponentType[2]
+                    {
+                        ComponentType.ReadOnly<PrefabRef>(),
+                        ComponentType.ReadOnly<Game.Net.Curve>(),
+                    },
+                    None = new ComponentType[3]
+                    {
+                        ComponentType.ReadOnly<Deleted>(),
+                        ComponentType.ReadOnly<Owner>(),
+                        ComponentType.ReadOnly<Temp>(),
+                    },
                 }
-            });
-            m_AreaQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new ComponentType[2]
+            );
+            m_AreaQuery = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                ComponentType.ReadOnly<PrefabRef>(),
-                ComponentType.ReadOnly<Game.Areas.Area>()
-                },
-                None = new ComponentType[3]
-                {
-                ComponentType.ReadOnly<Deleted>(),
-                ComponentType.ReadOnly<Owner>(),
-                ComponentType.ReadOnly<Temp>()
+                    All = new ComponentType[2]
+                    {
+                        ComponentType.ReadOnly<PrefabRef>(),
+                        ComponentType.ReadOnly<Game.Areas.Area>(),
+                    },
+                    None = new ComponentType[3]
+                    {
+                        ComponentType.ReadOnly<Deleted>(),
+                        ComponentType.ReadOnly<Owner>(),
+                        ComponentType.ReadOnly<Temp>(),
+                    },
                 }
-            });
-            m_OtherQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new ComponentType[1]
+            );
+            m_OtherQuery = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                ComponentType.ReadOnly<PrefabRef>()
-                },
-                None = new ComponentType[6]
-                {
-                ComponentType.ReadOnly<Deleted>(),
-                ComponentType.ReadOnly<Owner>(),
-                ComponentType.ReadOnly<Temp>(),
-                ComponentType.ReadOnly<Game.Objects.Object>(),
-                ComponentType.ReadOnly<Game.Net.Curve>(),
-                ComponentType.ReadOnly<Game.Areas.Area>()
+                    All = new ComponentType[1] { ComponentType.ReadOnly<PrefabRef>() },
+                    None = new ComponentType[6]
+                    {
+                        ComponentType.ReadOnly<Deleted>(),
+                        ComponentType.ReadOnly<Owner>(),
+                        ComponentType.ReadOnly<Temp>(),
+                        ComponentType.ReadOnly<Game.Objects.Object>(),
+                        ComponentType.ReadOnly<Game.Net.Curve>(),
+                        ComponentType.ReadOnly<Game.Areas.Area>(),
+                    },
                 }
-            });
-            m_ModifiedQuery = GetEntityQuery(new EntityQueryDesc
-            {
-                All = new ComponentType[1]
+            );
+            m_ModifiedQuery = GetEntityQuery(
+                new EntityQueryDesc
                 {
-                ComponentType.ReadOnly<PrefabRef>(),
-                //ComponentType.ReadOnly<Game.Objects.Object>()
-                },
-                Any = new ComponentType[3]
-                {
-                ComponentType.ReadOnly<Created>(),
-                ComponentType.ReadOnly<Updated>(),
-                ComponentType.ReadOnly<Deleted>()
-                },
-                None = new ComponentType[2]
-                {
-                ComponentType.ReadOnly<Owner>(),
-                ComponentType.ReadOnly<Temp>()
+                    All = new ComponentType[1]
+                    {
+                        ComponentType.ReadOnly<PrefabRef>(),
+                        //ComponentType.ReadOnly<Game.Objects.Object>()
+                    },
+                    Any = new ComponentType[3]
+                    {
+                        ComponentType.ReadOnly<Created>(),
+                        ComponentType.ReadOnly<Updated>(),
+                        ComponentType.ReadOnly<Deleted>(),
+                    },
+                    None = new ComponentType[2]
+                    {
+                        ComponentType.ReadOnly<Owner>(),
+                        ComponentType.ReadOnly<Temp>(),
+                    },
                 }
-            });
-            AddUpdateBinding(new GetterValueBinding<int>("editorHierarchy", "width", () => (SharedSettings.instance?.editor)?.hierarchyWidth ?? 350));
-            AddUpdateBinding(new GetterValueBinding<int>("editorHierarchy", "totalCount", () => m_TotalCount));
-            AddUpdateBinding(new GetterValueBinding<ItemId>("editorHierarchy", "selectedId", () => m_SelectedId, new ValueWriter<ItemId>()));
-            AddBinding(m_ViewportBinding = new GetterValueBinding<Viewport>("editorHierarchy", "viewport", () => m_Viewport, new ValueWriter<Viewport>()));
+            );
+            AddUpdateBinding(
+                new GetterValueBinding<int>(
+                    "editorHierarchy",
+                    "width",
+                    () => (SharedSettings.instance?.editor)?.hierarchyWidth ?? 350
+                )
+            );
+            AddUpdateBinding(
+                new GetterValueBinding<int>("editorHierarchy", "totalCount", () => m_TotalCount)
+            );
+            AddUpdateBinding(
+                new GetterValueBinding<ItemId>(
+                    "editorHierarchy",
+                    "selectedId",
+                    () => m_SelectedId,
+                    new ValueWriter<ItemId>()
+                )
+            );
+            AddBinding(
+                m_ViewportBinding = new GetterValueBinding<Viewport>(
+                    "editorHierarchy",
+                    "viewport",
+                    () => m_Viewport,
+                    new ValueWriter<Viewport>()
+                )
+            );
             AddBinding(m_CameraMode = new ValueBinding<int>("editorHierarchy", "cameraMode", 0));
-            AddBinding(new TriggerBinding<int>("editorHierarchy", "setWidth", delegate (int width)
-            {
-                EditorSettings editorSettings = SharedSettings.instance?.editor;
-                if (editorSettings != null)
-                {
-                    editorSettings.hierarchyWidth = width;
-                }
-            }));
-            AddBinding(new TriggerBinding<int, int>("editorHierarchy", "setViewportRange", delegate (int startIndex, int endIndex)
-            {
-                m_NextViewportStartIndex = startIndex;
-                m_NextViewportEndIndex = endIndex;
-            }));
-            AddBinding(new TriggerBinding<ItemId>("editorHierarchy", "setSelectedId", delegate (ItemId id)
-            {
-                m_SelectedId = id;
-                switch (id.type)
-                {
-                    case ItemType.Object:
-                        m_ToolSystem.selected = id.entity;
-                        m_EditorToolUISystem.SelectEntity(id.entity);
-                        break;
-                    case ItemType.SubMesh:
-                        m_ToolSystem.selected = id.entity;
-                        m_EditorToolUISystem.SelectEntitySubMesh(id.entity, id.subIndex);
-                        break;
-                    default:
-                        m_ToolSystem.selected = Entity.Null;
-                        m_EditorPanelUISystem.activePanel = panelItems.FirstOrDefault((PanelItem p) => p.type == id.type)?.panel;
-                        break;
-                }
-                RefreshCameraController((CameraMode)m_CameraMode.value);
-            }, new ValueReader<ItemId>()));
-            AddBinding(new TriggerBinding<ItemId, bool>("editorHierarchy", "setExpanded", delegate (ItemId id, bool expanded)
-            {
-                m_Dirty = true;
-                if (expanded)
-                {
-                    m_ExpandedIds.Add(id);
-                }
-                else
-                {
-                    m_ExpandedIds.Remove(id);
-                }
-            }, new ValueReader<ItemId>()));
-            AddBinding(new TriggerBinding<int>("editorHierarchy", "toggleCameraMode", delegate (int mode)
-            {
-                ToggleCameraMode((CameraMode)mode);
-            }));
-            AddBinding(new TriggerBinding<Entity>("editorHierarchy", "save", delegate (Entity entity)
-            {
-                PrefabRef componentData = base.EntityManager.GetComponentData<PrefabRef>(entity);
-                EditorPrefabUtils.SavePrefab(m_PrefabSystem.GetPrefab<PrefabBase>(componentData));
-                PlatformManager.instance.UnlockAchievement(Achievements.IMadeThis);
-                onSave?.Invoke(entity);
-            }));
-            AddBinding(new TriggerBinding<Entity>("editorHierarchy", "bulldoze", delegate (Entity entity)
-            {
-                onBulldoze?.Invoke(entity);
-            }));
+            AddBinding(
+                new TriggerBinding<int>(
+                    "editorHierarchy",
+                    "setWidth",
+                    delegate(int width)
+                    {
+                        EditorSettings editorSettings = SharedSettings.instance?.editor;
+                        if (editorSettings != null)
+                        {
+                            editorSettings.hierarchyWidth = width;
+                        }
+                    }
+                )
+            );
+            AddBinding(
+                new TriggerBinding<int, int>(
+                    "editorHierarchy",
+                    "setViewportRange",
+                    delegate(int startIndex, int endIndex)
+                    {
+                        m_NextViewportStartIndex = startIndex;
+                        m_NextViewportEndIndex = endIndex;
+                    }
+                )
+            );
+            AddBinding(
+                new TriggerBinding<ItemId>(
+                    "editorHierarchy",
+                    "setSelectedId",
+                    delegate(ItemId id)
+                    {
+                        m_SelectedId = id;
+                        switch (id.type)
+                        {
+                            case ItemType.Object:
+                                m_ToolSystem.selected = id.entity;
+                                m_EditorToolUISystem.SelectEntity(id.entity);
+                                break;
+                            case ItemType.SubMesh:
+                                m_ToolSystem.selected = id.entity;
+                                m_EditorToolUISystem.SelectEntitySubMesh(id.entity, id.subIndex);
+                                break;
+                            default:
+                                m_ToolSystem.selected = Entity.Null;
+                                m_EditorPanelUISystem.activePanel = panelItems
+                                    .FirstOrDefault((PanelItem p) => p.type == id.type)
+                                    ?.panel;
+                                break;
+                        }
+                        RefreshCameraController((CameraMode)m_CameraMode.value);
+                    },
+                    new ValueReader<ItemId>()
+                )
+            );
+            AddBinding(
+                new TriggerBinding<ItemId, bool>(
+                    "editorHierarchy",
+                    "setExpanded",
+                    delegate(ItemId id, bool expanded)
+                    {
+                        m_Dirty = true;
+                        if (expanded)
+                        {
+                            m_ExpandedIds.Add(id);
+                        }
+                        else
+                        {
+                            m_ExpandedIds.Remove(id);
+                        }
+                    },
+                    new ValueReader<ItemId>()
+                )
+            );
+            AddBinding(
+                new TriggerBinding<int>(
+                    "editorHierarchy",
+                    "toggleCameraMode",
+                    delegate(int mode)
+                    {
+                        ToggleCameraMode((CameraMode)mode);
+                    }
+                )
+            );
+            AddBinding(
+                new TriggerBinding<Entity>(
+                    "editorHierarchy",
+                    "save",
+                    delegate(Entity entity)
+                    {
+                        PrefabRef componentData = base.EntityManager.GetComponentData<PrefabRef>(
+                            entity
+                        );
+                        EditorPrefabUtils.SavePrefab(
+                            m_PrefabSystem.GetPrefab<PrefabBase>(componentData)
+                        );
+                        PlatformManager.instance.UnlockAchievement(Achievements.IMadeThis);
+                        onSave?.Invoke(entity);
+                    }
+                )
+            );
+            AddBinding(
+                new TriggerBinding<Entity>(
+                    "editorHierarchy",
+                    "bulldoze",
+                    delegate(Entity entity)
+                    {
+                        onBulldoze?.Invoke(entity);
+                    }
+                )
+            );
             panelItems = new List<PanelItem>
-        {
-            new PanelItem(ItemType.Map, 0, base.World.GetOrCreateSystemManaged<MapPanelSystem>()),
-            new PanelItem(ItemType.Climate, 1, base.World.GetOrCreateSystemManaged<ClimatePanelSystem>()),
-            new PanelItem(ItemType.Water, 1, base.World.GetOrCreateSystemManaged<WaterPanelSystem>()),
-            new PanelItem(ItemType.Resources, 1, base.World.GetOrCreateSystemManaged<ResourcePanelSystem>())
-        };
+            {
+                new PanelItem(
+                    ItemType.Map,
+                    0,
+                    base.World.GetOrCreateSystemManaged<MapPanelSystem>()
+                ),
+                new PanelItem(
+                    ItemType.Climate,
+                    1,
+                    base.World.GetOrCreateSystemManaged<ClimatePanelSystem>()
+                ),
+                new PanelItem(
+                    ItemType.Water,
+                    1,
+                    base.World.GetOrCreateSystemManaged<WaterPanelSystem>()
+                ),
+                new PanelItem(
+                    ItemType.Resources,
+                    1,
+                    base.World.GetOrCreateSystemManaged<ResourcePanelSystem>()
+                ),
+            };
             m_Hierarchy = new NativeList<HierarchyItem>(Allocator.Persistent);
             m_ExpandedIds = new NativeParallelHashSet<ItemId>(128, Allocator.Persistent);
             m_Viewport = new Viewport();
@@ -617,17 +738,23 @@ namespace SaveAllPrefabs.Systems
                     m_SelectedId = new ItemId
                     {
                         type = ItemType.Object,
-                        entity = m_ToolSystem.selected
+                        entity = m_ToolSystem.selected,
                     };
                     RefreshCameraController((CameraMode)m_CameraMode.value);
                 }
                 return;
             }
-            PanelItem panelItem = panelItems.FirstOrDefault((PanelItem p) => p.type == m_SelectedId.type);
+            PanelItem panelItem = panelItems.FirstOrDefault(
+                (PanelItem p) => p.type == m_SelectedId.type
+            );
             if (m_EditorPanelUISystem.activePanel != panelItem?.panel)
             {
-                PanelItem panelItem2 = panelItems.FirstOrDefault((PanelItem p) => p.panel == m_EditorPanelUISystem.activePanel);
-                m_SelectedId = ((panelItem2 != null) ? new ItemId(panelItem2.type) : default(ItemId));
+                PanelItem panelItem2 = panelItems.FirstOrDefault(
+                    (PanelItem p) => p.panel == m_EditorPanelUISystem.activePanel
+                );
+                m_SelectedId = (
+                    (panelItem2 != null) ? new ItemId(panelItem2.type) : default(ItemId)
+                );
             }
         }
 
@@ -649,7 +776,10 @@ namespace SaveAllPrefabs.Systems
 
         private bool ViewportChanged()
         {
-            if (m_NextViewportStartIndex != m_Viewport.startIndex || m_NextViewportEndIndex != m_Viewport.startIndex + m_Viewport.items.Count)
+            if (
+                m_NextViewportStartIndex != m_Viewport.startIndex
+                || m_NextViewportEndIndex != m_Viewport.startIndex + m_Viewport.items.Count
+            )
             {
                 return true;
             }
@@ -678,7 +808,11 @@ namespace SaveAllPrefabs.Systems
             result.expanded = item.expanded;
             result.name = GetName(item.id);
             result.selectable = item.selectable;
-            result.saveable = item.id.type == ItemType.Object && base.EntityManager.TryGetComponent<PrefabRef>(item.id.entity, out var component) && m_PrefabSystem.TryGetPrefab<PrefabBase>(component, out var prefab) && !prefab.builtin;
+            result.saveable =
+                item.id.type == ItemType.Object
+                && base.EntityManager.TryGetComponent<PrefabRef>(item.id.entity, out var component)
+                && m_PrefabSystem.TryGetPrefab<PrefabBase>(component, out var prefab)
+                && !prefab.builtin;
             return result;
         }
 
@@ -689,12 +823,28 @@ namespace SaveAllPrefabs.Systems
             PrefabBase prefab2;
             if (id.type == ItemType.Object)
             {
-                if (base.EntityManager.TryGetComponent<PrefabRef>(id.entity, out var component) && m_PrefabSystem.TryGetPrefab<PrefabBase>(component, out var prefab))
+                if (
+                    base.EntityManager.TryGetComponent<PrefabRef>(id.entity, out var component)
+                    && m_PrefabSystem.TryGetPrefab<PrefabBase>(component, out var prefab)
+                )
                 {
                     return LocalizedString.Value(prefab.name);
                 }
             }
-            else if (id.type == ItemType.SubMesh && base.EntityManager.TryGetComponent<PrefabRef>(id.entity, out component2) && base.EntityManager.TryGetBuffer(component2.m_Prefab, isReadOnly: true, out buffer) && id.subIndex < buffer.Length && m_PrefabSystem.TryGetPrefab<PrefabBase>(buffer[id.subIndex].m_SubMesh, out prefab2))
+            else if (
+                id.type == ItemType.SubMesh
+                && base.EntityManager.TryGetComponent<PrefabRef>(id.entity, out component2)
+                && base.EntityManager.TryGetBuffer(
+                    component2.m_Prefab,
+                    isReadOnly: true,
+                    out buffer
+                )
+                && id.subIndex < buffer.Length
+                && m_PrefabSystem.TryGetPrefab<PrefabBase>(
+                    buffer[id.subIndex].m_SubMesh,
+                    out prefab2
+                )
+            )
             {
                 return LocalizedString.Value(prefab2.name);
             }
@@ -710,17 +860,37 @@ namespace SaveAllPrefabs.Systems
                 {
                     id = new ItemId(panelItem.type),
                     level = panelItem.level,
-                    selectable = true
+                    selectable = true,
                 };
                 hierarchy.Add(in value);
             }
-            ScheduleJobForItemType(hierarchy, m_ObjectQuery, ItemType.Object, ItemType.ObjectContainer);
-            ScheduleJobForItemType(hierarchy, m_NetworkQuery, ItemType.Object, ItemType.NetworkContainer);
+            ScheduleJobForItemType(
+                hierarchy,
+                m_ObjectQuery,
+                ItemType.Object,
+                ItemType.ObjectContainer
+            );
+            ScheduleJobForItemType(
+                hierarchy,
+                m_NetworkQuery,
+                ItemType.Object,
+                ItemType.NetworkContainer
+            );
             ScheduleJobForItemType(hierarchy, m_AreaQuery, ItemType.Object, ItemType.AreaContainer);
-            ScheduleJobForItemType(hierarchy, m_OtherQuery, ItemType.Object, ItemType.OtherContainer);
+            ScheduleJobForItemType(
+                hierarchy,
+                m_OtherQuery,
+                ItemType.Object,
+                ItemType.OtherContainer
+            );
         }
 
-        private void ScheduleJobForItemType(NativeList<HierarchyItem> hierarchy, EntityQuery query, ItemType itemType, ItemType containerType)
+        private void ScheduleJobForItemType(
+            NativeList<HierarchyItem> hierarchy,
+            EntityQuery query,
+            ItemType itemType,
+            ItemType containerType
+        )
         {
             if (!query.IsEmptyIgnoreFilter)
             {
@@ -732,25 +902,40 @@ namespace SaveAllPrefabs.Systems
                     level = 0,
                     expandable = true,
                     expanded = m_ExpandedIds.Contains(itemId),
-                    selectable = false
+                    selectable = false,
                 };
                 hierarchy.Add(in value);
                 if (num)
                 {
-                    __TypeHandle.__Game_Prefabs_SubMesh_RO_BufferLookup.Update(ref base.CheckedStateRef);
-                    __TypeHandle.__Game_Prefabs_PrefabRef_RO_ComponentTypeHandle.Update(ref base.CheckedStateRef);
-                    __TypeHandle.__Unity_Entities_Entity_TypeHandle.Update(ref base.CheckedStateRef);
+                    //__TypeHandle.__Game_Prefabs_SubMesh_RO_BufferLookup.Update(ref base.CheckedStateRef);
+                    //__TypeHandle.__Game_Prefabs_PrefabRef_RO_ComponentTypeHandle.Update(ref base.CheckedStateRef);
+                    //__TypeHandle.__Unity_Entities_Entity_TypeHandle.Update(ref base.CheckedStateRef);
                     ObjectHierarchyJob objectHierarchyJob = default(ObjectHierarchyJob);
-                    objectHierarchyJob.m_EntityType = __TypeHandle.__Unity_Entities_Entity_TypeHandle;
-                    objectHierarchyJob.m_PrefabRefType = __TypeHandle.__Game_Prefabs_PrefabRef_RO_ComponentTypeHandle;
-                    objectHierarchyJob.m_SubMeshes = __TypeHandle.__Game_Prefabs_SubMesh_RO_BufferLookup;
+                    objectHierarchyJob.m_EntityType = InternalCompilerInterface.GetEntityTypeHandle(
+                        ref __TypeHandle.__Unity_Entities_Entity_TypeHandle,
+                        ref CheckedStateRef
+                    );
+                    objectHierarchyJob.m_PrefabRefType =
+                        InternalCompilerInterface.GetComponentTypeHandle<PrefabRef>(
+                            ref this.__TypeHandle.__Game_Prefabs_PrefabRef_RO_ComponentTypeHandle,
+                            ref base.CheckedStateRef
+                        );
+                    ;
+                    objectHierarchyJob.m_SubMeshes =
+                        InternalCompilerInterface.GetBufferLookup<SubMesh>(
+                            ref this.__TypeHandle.__Game_Prefabs_SubMesh_RO_BufferLookup,
+                            ref base.CheckedStateRef
+                        );
                     objectHierarchyJob.m_ExpandedIds = m_ExpandedIds;
                     objectHierarchyJob.m_Hierarchy = hierarchy;
                     objectHierarchyJob.m_ContainerType = containerType;
                     objectHierarchyJob.m_ItemType = itemType;
                     ObjectHierarchyJob jobData = objectHierarchyJob;
                     base.Dependency = JobChunkExtensions.Schedule(jobData, query, base.Dependency);
-                    base.Dependency = EditorHierarchyUISystem_4CF10000_LambdaJob_0_Execute(hierarchy, base.Dependency);
+                    base.Dependency = EditorHierarchyUISystem_4CF10000_LambdaJob_0_Execute(
+                        hierarchy,
+                        base.Dependency
+                    );
                 }
             }
         }
@@ -776,7 +961,9 @@ namespace SaveAllPrefabs.Systems
                     break;
                 default:
                     m_ToolSystem.selected = Entity.Null;
-                    m_EditorPanelUISystem.activePanel = panelItems.FirstOrDefault((PanelItem p) => p.type == id.type)?.panel;
+                    m_EditorPanelUISystem.activePanel = panelItems
+                        .FirstOrDefault((PanelItem p) => p.type == id.type)
+                        ?.panel;
                     break;
             }
             RefreshCameraController((CameraMode)m_CameraMode.value);
@@ -803,12 +990,21 @@ namespace SaveAllPrefabs.Systems
 
         private void RefreshCameraController(CameraMode mode)
         {
-            if (mode == CameraMode.Default || (mode == CameraMode.Orbit && m_SelectedId.entity == Entity.Null))
+            if (
+                mode == CameraMode.Default
+                || (mode == CameraMode.Orbit && m_SelectedId.entity == Entity.Null)
+            )
             {
-                if (m_CameraUpdateSystem.activeCameraController != m_CameraUpdateSystem.gamePlayController)
+                if (
+                    m_CameraUpdateSystem.activeCameraController
+                    != m_CameraUpdateSystem.gamePlayController
+                )
                 {
-                    m_CameraUpdateSystem.gamePlayController.TryMatchPosition(m_CameraUpdateSystem.activeCameraController);
-                    m_CameraUpdateSystem.activeCameraController = m_CameraUpdateSystem.gamePlayController;
+                    m_CameraUpdateSystem.gamePlayController.TryMatchPosition(
+                        m_CameraUpdateSystem.activeCameraController
+                    );
+                    m_CameraUpdateSystem.activeCameraController =
+                        m_CameraUpdateSystem.gamePlayController;
                 }
                 return;
             }
@@ -816,17 +1012,29 @@ namespace SaveAllPrefabs.Systems
             {
                 case CameraMode.Orbit:
                     m_CameraUpdateSystem.orbitCameraController.followedEntity = m_SelectedId.entity;
-                    if (m_CameraUpdateSystem.activeCameraController != m_CameraUpdateSystem.orbitCameraController)
+                    if (
+                        m_CameraUpdateSystem.activeCameraController
+                        != m_CameraUpdateSystem.orbitCameraController
+                    )
                     {
-                        m_CameraUpdateSystem.orbitCameraController.TryMatchPosition(m_CameraUpdateSystem.activeCameraController);
-                        m_CameraUpdateSystem.activeCameraController = m_CameraUpdateSystem.orbitCameraController;
+                        m_CameraUpdateSystem.orbitCameraController.TryMatchPosition(
+                            m_CameraUpdateSystem.activeCameraController
+                        );
+                        m_CameraUpdateSystem.activeCameraController =
+                            m_CameraUpdateSystem.orbitCameraController;
                     }
                     break;
                 case CameraMode.FirstPerson:
-                    if (m_CameraUpdateSystem.activeCameraController != m_CameraUpdateSystem.cinematicCameraController)
+                    if (
+                        m_CameraUpdateSystem.activeCameraController
+                        != m_CameraUpdateSystem.cinematicCameraController
+                    )
                     {
-                        m_CameraUpdateSystem.cinematicCameraController.TryMatchPosition(m_CameraUpdateSystem.activeCameraController);
-                        m_CameraUpdateSystem.activeCameraController = m_CameraUpdateSystem.cinematicCameraController;
+                        m_CameraUpdateSystem.cinematicCameraController.TryMatchPosition(
+                            m_CameraUpdateSystem.activeCameraController
+                        );
+                        m_CameraUpdateSystem.activeCameraController =
+                            m_CameraUpdateSystem.cinematicCameraController;
                     }
                     break;
             }
@@ -859,9 +1067,13 @@ namespace SaveAllPrefabs.Systems
             onBulldoze?.Invoke(entity);
         }
 
-        private JobHandle EditorHierarchyUISystem_4CF10000_LambdaJob_0_Execute(NativeList<HierarchyItem> hierarchy, JobHandle __inputDependency)
+        private JobHandle EditorHierarchyUISystem_4CF10000_LambdaJob_0_Execute(
+            NativeList<HierarchyItem> hierarchy,
+            JobHandle __inputDependency
+        )
         {
-            EditorHierarchyUISystem_4CF10000_LambdaJob_0_Job jobData = default(EditorHierarchyUISystem_4CF10000_LambdaJob_0_Job);
+            EditorHierarchyUISystem_4CF10000_LambdaJob_0_Job jobData =
+                default(EditorHierarchyUISystem_4CF10000_LambdaJob_0_Job);
             jobData.hierarchy = hierarchy;
             return IJobExtensions.Schedule(jobData, __inputDependency);
         }
@@ -869,6 +1081,8 @@ namespace SaveAllPrefabs.Systems
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void __AssignQueries(ref SystemState state)
         {
+            EntityQueryBuilder entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp);
+            entityQueryBuilder.Dispose();
         }
 
         protected override void OnCreateForCompiler()
@@ -879,9 +1093,6 @@ namespace SaveAllPrefabs.Systems
         }
 
         [Preserve]
-        public PatchedEditorHierarchyUISystem()
-        {
-        }
+        public PatchedEditorHierarchyUISystem() { }
     }
-
 }

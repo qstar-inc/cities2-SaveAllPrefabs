@@ -5,10 +5,12 @@ namespace SaveAllPrefabs
 {
     public class LocaleEN : IDictionarySource
     {
-        public LocaleEN()
-        {
-        }
-        public IEnumerable<KeyValuePair<string, string>> ReadEntries(IList<IDictionaryEntryError> errors, Dictionary<string, int> indexCounts)
+        public LocaleEN() { }
+
+        public IEnumerable<KeyValuePair<string, string>> ReadEntries(
+            IList<IDictionaryEntryError> errors,
+            Dictionary<string, int> indexCounts
+        )
         {
             return new Dictionary<string, string>
             {
@@ -18,9 +20,6 @@ namespace SaveAllPrefabs
             };
         }
 
-        public void Unload()
-        {
-
-        }
+        public void Unload() { }
     }
 }
